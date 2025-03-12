@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  mssql:
+    image: mcr.microsoft.com/azure-sql-edge
+    cap_add: [ 'SYS_PTRACE' ]
+    command: /opt/mssql/bin/sqlservr
+    ports:
+      - "1450:1433"
+    volumes:
+      - ./sql:/var/opt/mssql
+      - ./mssql_scripts/Road65_Autumn_2024.bak:/backup/Road65_Autumn_2024.bak
+    environment:
+      - ACCEPT_EULA=Y
+      - "MSSQL_SA_PASSWORD=VLcaDAge^njD%811"
+    stdin_open: true
+    networks:
+      - db_net
+      
+  sqlcmd:
+    image: mcr.microsoft.com/mssql-tools:latest
+    environment:
+      - "MSSQL_SA_PASSWORD=VLcaDAge^njD%811"
+    command: /opt/mssql_scripts/init.sh
+    stdin_open: true
+    volumes:
+      - ./mssql_scripts:/opt/mssql_scripts
+    networks:
+      - db_net
+
+networks:
+  db_net:
+    name: db_net
